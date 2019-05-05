@@ -1,0 +1,43 @@
+language: go
+
+go:
+  - "1.11.x"
+  - master
+
+# Force-enable Go modules. Also force go to use the code in vendor/
+# These will both be unnecessary when Go 1.13 lands.
+env:
+  global:
+    - secure: "kPeXks9xO8ppCff87a67eWyAM5NkbDLfVv0AVS4IWItFNMT7z411hi2s5l8GcMv80MEaV3+cyS7DwtsuUXMNMlnm0/axE+TUOalR4ePj/swRnLsbKVof/AmgEMREAKZrcwOwXTrRXQyAkdrKTxBRmBzOrQoz9kX3HlfownzsKVxvleEUKHJTR0apvLvd14IWX+256BYCMruBU3OxjILTomLbTNzXjpOU9H2wfbQAbnWocX38rO/EsJL0UvLpyRaloQdW4i2U5IsIKprwLovOgt+naejO+8qGsjSBgIj15i01smpsFH4uNqQZyZFGzVm4O2CjFBIjI4V5KK1n40wo6UgLO5X9ZtgCN2S4PPkyWJkTXTUr1jWtrUUimtrP4CKE5/uyZZasAZDQ4/ufxiKh0dZTk7jqJYX/lZdQ+9szEdsD97rD25ROQAG10LgHrwhPLNGsl+AAjSisL34FUMMcjn7pDieIPQOxFhtDyuuoPRCeR2u4vihnn61h71BMtgBlcGQ2WUj1s4sYSlzmVhJW2ZQkOIzingIorEhIWLtdi86GYKv7RXMMQqy41faQ6sOlKGwUiX4qEthKCGyid7wj3ej4AbICto4hTtbsI+3D3s1fWo+0fCSg/zrR4Ln7fYZTDeJfLKa2xTWyuEx+IMdQwTYHICGyqS4DGzITV3cN14Q="
+    - GO111MODULE=on
+
+# Only clone the most recent commit.
+git:
+  depth: 1
+
+# Skip the install step. Don't `go get` dependencies. Only build with the code
+# in vendor/
+install: true
+
+# Don't email me the results of the test runs.
+# https://docs.travis-ci.com/user/notifications/#configuring-slack-notifications
+notifications:
+  email: false
+  # slack:
+  #   on_success: always
+  #   on_failure: never
+
+before_script:
+  - go get golang.org/x/lint/golint
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+
+script:
+  - ${GOPATH}/bin/golint ./...
+  - go test -v -race -covermode=atomic -coverprofile=coverage.out ./... # Run all the tests with the race detector enabled
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+
+# before_deploy:
+# deploy:
+#   skip_cleanup: true
+# after_deploy:
