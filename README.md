@@ -21,11 +21,11 @@ import github.com/illuminasy/gomysql/migrate
 // copy all your migration sql there
 // check github.com/golang-migrate/migrate for more details
 config := gomysql.Config{
-	DBHost: "localhost'
-	DBPort: "3306"
-	DBUser: "root"
-	DBPass: "root"
-	DBName: "testdb"
+	DBHost: "localhost",
+	DBPort: "3306",
+	DBUser: "root",
+	DBPass: "root",
+	DBName: "testdb",
 	MigrationDir "somedir" // use this to use custom directory
 }
 

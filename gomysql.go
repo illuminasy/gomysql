@@ -119,7 +119,7 @@ func getDbConn(config Config) (*sql.DB, error) {
 		buildParameters(config),
 	)
 
-	db, err := sql.Open("postgres", psqlSource)
+	db, err := sql.Open("mysql", psqlSource)
 	if err != nil {
 		return nil, err
 	}
