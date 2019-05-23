@@ -36,11 +36,24 @@ type Client struct {
 type Datastore interface {
 	getConfig() *Config
 	ConnCheck() (bool, error)
+	GetStats()
+
 	Query(query string, params []interface{}) (*sql.Rows, error)
-	QueryRow(query string, params []interface{}) (*sql.Rows, error)
+	QueryRow(query string, params []interface{}) (*sql.Row, error)
 	Exec(query string, params []interface{}) (sql.Result, error)
 
+	Prepare(query string) (*sql.Stmt, error)
+	StmtQuery(stmt *sql.Stmt, params []interface{}) (*sql.Rows, error)
+	StmtQueryRow(stmt *sql.Stmt, params []interface{}) *sql.Row
 	StmtExec(stmt *sql.Stmt, params []interface{}) (sql.Result, error)
+
+	BeginTx() (*sql.Tx, error)
+	TxPrepare(tx *sql.Tx, query string) (*sql.Stmt, error)
+	TxQuery(tx *sql.Tx, query string, params []interface{}) (*sql.Rows, error)
+	TxQueryRow(tx *sql.Tx, query string, params []interface{}) *sql.Row
+	TxExec(tx *sql.Tx, query string, params []interface{}) (sql.Result, error)
+	TxCommit(tx *sql.Tx) error
+	TxRollback(tx *sql.Tx) error
 
 	Migrate() error
 }
@@ -68,13 +81,23 @@ func (c Client) ConnCheck() (bool, error) {
 	return false, err
 }
 
+// GetStats return database stats
+func (c Client) GetStats() (sql.DBStats, error) {
+	dbConn, err := getDbConn(c.config)
+	defer dbConn.Close()
+	if err != nil {
+		return sql.DBStats{}, err
+	}
+
+	return dbConn.Stats(), nil
+}
+
 // Query queries multiple rows
 func (c Client) Query(query string, params []interface{}) (*sql.Rows, error) {
 	dbConn, err := getDbConn(c.config)
 	if err != nil {
 		return nil, err
 	}
-	defer dbConn.Close()
 
 	return dbConn.Query(query, params...)
 }
@@ -85,7 +108,6 @@ func (c Client) QueryRow(query string, params []interface{}) (*sql.Row, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer dbConn.Close()
 
 	return dbConn.QueryRow(query, params...), nil
 }
@@ -96,9 +118,27 @@ func (c Client) Exec(query string, params []interface{}) (sql.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer dbConn.Close()
 
 	return dbConn.Exec(query, params...)
+}
+
+// Prepare Prepare query
+func (c Client) Prepare(query string) (*sql.Stmt, error) {
+	dbConn, err := getDbConn(c.config)
+	if err != nil {
+		return nil, err
+	}
+	return dbConn.Prepare(query)
+}
+
+// StmtQuery queries multiple rows
+func (c Client) StmtQuery(stmt *sql.Stmt, params []interface{}) (*sql.Rows, error) {
+	return stmt.Query(params...)
+}
+
+// StmtQueryRow Execute query and returns single row
+func (c Client) StmtQueryRow(stmt *sql.Stmt, params []interface{}) *sql.Row {
+	return stmt.QueryRow(params...)
 }
 
 // StmtExec Execute query
@@ -106,10 +146,45 @@ func (c Client) StmtExec(stmt *sql.Stmt, params []interface{}) (sql.Result, erro
 	return stmt.Exec(params...)
 }
 
+// TxBegin Start and return transaction
+func (c Client) TxBegin() (*sql.Tx, error) {
+	dbConn, err := getDbConn(c.config)
+	if err != nil {
+		return nil, err
+	}
+
+	return dbConn.Begin()
+}
+
+// TxQuery queries multiple rows
+func (c Client) TxQuery(tx *sql.Tx, query string, params []interface{}) (*sql.Rows, error) {
+	return tx.Query(query, params...)
+}
+
+// TxQueryRow Execute query and returns single row
+func (c Client) TxQueryRow(tx *sql.Tx, query string, params []interface{}) *sql.Row {
+	return tx.QueryRow(query, params...)
+}
+
+// TxExec Execute query
+func (c Client) TxExec(tx *sql.Tx, query string, params []interface{}) (sql.Result, error) {
+	return tx.Exec(query, params...)
+}
+
+// TxCommit commits transaction
+func (c Client) TxCommit(tx *sql.Tx) error {
+	return tx.Commit()
+}
+
+// TxRollback rollback transaction
+func (c Client) TxRollback(tx *sql.Tx) error {
+	return tx.Rollback()
+}
+
 func getDbConn(config Config) (*sql.DB, error) {
 	var db *sql.DB
 
-	var psqlSource = fmt.Sprintf(
+	var mysqlSource = fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s%s",
 		config.DBUser,
 		config.DBPass,
@@ -119,7 +194,7 @@ func getDbConn(config Config) (*sql.DB, error) {
 		buildParameters(config),
 	)
 
-	db, err := sql.Open("mysql", psqlSource)
+	db, err := sql.Open("mysql", mysqlSource)
 	if err != nil {
 		return nil, err
 	}
