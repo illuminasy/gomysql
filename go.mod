@@ -10,7 +10,11 @@ require (
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang-migrate/migrate/v4 v4.3.1
 	github.com/google/go-cmp v0.3.0 // indirect
-	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c // indirect
-	golang.org/x/sys v0.0.0-20190502175342-a43fa875dd82 // indirect
-	google.golang.org/genproto v0.0.0-20190502173448-54afdca5d873 // indirect
+	github.com/gorilla/mux v1.7.2 // indirect
+	github.com/sirupsen/logrus v1.4.2 // indirect
+	golang.org/x/net v0.0.0-20190522155817-f3200d17e092 // indirect
+	golang.org/x/sys v0.0.0-20190522044717-8097e1b27ff5 // indirect
+	google.golang.org/appengine v1.6.0 // indirect
+	google.golang.org/genproto v0.0.0-20190522204451-c2c4e71fbf69 // indirect
+	google.golang.org/grpc v1.21.0 // indirect
 )
