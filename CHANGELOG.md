@@ -1,3 +1,6 @@
+## 0.1.3 (May 25, 2019)
+  - Added query builder helper
+
 ## 0.1.2 (May 23, 2019)
   - Added prepare and transactions
 
