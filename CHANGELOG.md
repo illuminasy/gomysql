@@ -1,3 +1,6 @@
+## 0.2.0 (September 24, 2022)
+  - Upgrade packages
+
 ## 0.1.3 (May 25, 2019)
   - Added query builder helper
 
