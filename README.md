@@ -19,7 +19,7 @@ import github.com/illuminasy/gomysql/migrate
 
 //MigrationDir default directory "./internal/database/migration/sql"
 // copy all your migration sql there
-// check github.com/golang-migrate/migrate for more details
+// check github.com/golang-migrate/migrate/v4 for more details
 config := gomysql.Config{
 	DBHost: "localhost",
 	DBPort: "3306",

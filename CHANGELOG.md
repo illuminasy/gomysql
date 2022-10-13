@@ -1,3 +1,6 @@
+## 0.2.1 (October 14, 2022)
+  - fixed migrate version to use v4
+
 ## 0.2.0 (September 24, 2022)
   - Upgrade packages
 
