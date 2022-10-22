@@ -1,3 +1,6 @@
+## 0.2.2 (October 23, 2022)
+  - Added DB config parse time
+
 ## 0.2.1 (October 14, 2022)
   - fixed migrate version to use v4
 
