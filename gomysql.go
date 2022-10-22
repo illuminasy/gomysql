@@ -25,6 +25,7 @@ type Config struct {
 	DBCharset    string
 	DBCollation  string
 	MigrationDir string
+	ParaseTime   string
 }
 
 // Client ...
@@ -212,6 +213,10 @@ func getDbConn(config Config) (*sql.DB, error) {
 
 func buildParameters(config Config) string {
 	var dbParameters = "?"
+
+	if len(config.ParaseTime) > 0 {
+		dbParameters += "parseTime=true&"
+	}
 
 	if len(config.DBSSL) > 0 {
 		dbParameters += "tls=true&"
