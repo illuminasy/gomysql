@@ -1,3 +1,6 @@
+## 0.3.1 (November 18, 2022)
+  - Removed db.close
+
 ## 0.3.0 (November 18, 2022)
   - Added configurable maxconn and idle conn with timeout
   - Added db close where ever required
