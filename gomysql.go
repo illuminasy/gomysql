@@ -101,8 +101,6 @@ func (c Client) GetStats() (sql.DBStats, error) {
 		return sql.DBStats{}, err
 	}
 
-	defer dbConn.Close()
-
 	return dbConn.Stats(), nil
 }
 
@@ -112,8 +110,6 @@ func (c Client) Query(query string, params []interface{}) (*sql.Rows, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	defer dbConn.Close()
 
 	return dbConn.Query(query, params...)
 }
@@ -125,8 +121,6 @@ func (c Client) QueryRow(query string, params []interface{}) (*sql.Row, error) {
 		return nil, err
 	}
 
-	defer dbConn.Close()
-
 	return dbConn.QueryRow(query, params...), nil
 }
 
@@ -137,8 +131,6 @@ func (c Client) Exec(query string, params []interface{}) (sql.Result, error) {
 		return nil, err
 	}
 
-	defer dbConn.Close()
-
 	return dbConn.Exec(query, params...)
 }
 
@@ -148,8 +140,6 @@ func (c Client) Prepare(query string) (*sql.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	defer dbConn.Close()
 
 	return dbConn.Prepare(query)
 }
