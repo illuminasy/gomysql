@@ -3,6 +3,7 @@ package gomysql
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -11,21 +12,31 @@ import (
 const MaxOpenConns = 10
 
 // MaxIdleConns maximum idle connections
-const MaxIdleConns = 20
+const MaxIdleConns = 5
+
+// MaxOpenConnsTime maximum connection timeout
+const MaxOpenConnsTime = 30 * time.Second
+
+// MaxIdleConnsTime maximum idle connection timeout
+const MaxIdleConnsTime = 1 * time.Second
 
 // Config ...
 type Config struct {
-	DBHost       string
-	DBPort       string
-	DBUser       string
-	DBPass       string
-	DBName       string
-	DBSSL        string
-	DBTimeout    string
-	DBCharset    string
-	DBCollation  string
-	MigrationDir string
-	ParaseTime   string
+	DBHost           string
+	DBPort           string
+	DBUser           string
+	DBPass           string
+	DBName           string
+	DBSSL            string
+	DBTimeout        string
+	DBCharset        string
+	DBCollation      string
+	MigrationDir     string
+	ParaseTime       string
+	MaxOpenConns     int
+	MaxIdleConns     int
+	MaxOpenConnsTime time.Duration
+	MaxIdleConnsTime time.Duration
 }
 
 // Client ...
@@ -69,10 +80,11 @@ func GetClient(c Config) *Client {
 // ConnCheck check if connection exists
 func (c Client) ConnCheck() (bool, error) {
 	dbConn, err := getDbConn(c.config)
-	defer dbConn.Close()
 	if err != nil {
 		return false, err
 	}
+
+	defer dbConn.Close()
 
 	err = dbConn.Ping()
 	if err == nil {
@@ -85,10 +97,11 @@ func (c Client) ConnCheck() (bool, error) {
 // GetStats return database stats
 func (c Client) GetStats() (sql.DBStats, error) {
 	dbConn, err := getDbConn(c.config)
-	defer dbConn.Close()
 	if err != nil {
 		return sql.DBStats{}, err
 	}
+
+	defer dbConn.Close()
 
 	return dbConn.Stats(), nil
 }
@@ -100,6 +113,8 @@ func (c Client) Query(query string, params []interface{}) (*sql.Rows, error) {
 		return nil, err
 	}
 
+	defer dbConn.Close()
+
 	return dbConn.Query(query, params...)
 }
 
@@ -109,6 +124,8 @@ func (c Client) QueryRow(query string, params []interface{}) (*sql.Row, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	defer dbConn.Close()
 
 	return dbConn.QueryRow(query, params...), nil
 }
@@ -120,6 +137,8 @@ func (c Client) Exec(query string, params []interface{}) (sql.Result, error) {
 		return nil, err
 	}
 
+	defer dbConn.Close()
+
 	return dbConn.Exec(query, params...)
 }
 
@@ -129,6 +148,9 @@ func (c Client) Prepare(query string) (*sql.Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	defer dbConn.Close()
+
 	return dbConn.Prepare(query)
 }
 
@@ -205,8 +227,34 @@ func getDbConn(config Config) (*sql.DB, error) {
 		return nil, err
 	}
 
-	db.SetMaxOpenConns(MaxOpenConns)
-	db.SetMaxIdleConns(MaxIdleConns)
+	moc := MaxOpenConns
+
+	if config.MaxOpenConns > 0 {
+		moc = config.MaxOpenConns
+	}
+
+	mic := MaxIdleConns
+
+	if config.MaxIdleConns > 0 {
+		mic = config.MaxIdleConns
+	}
+
+	moct := MaxOpenConnsTime
+
+	if config.MaxOpenConnsTime > 0 {
+		moct = config.MaxOpenConnsTime
+	}
+
+	mict := MaxIdleConnsTime
+
+	if config.MaxIdleConnsTime > 0 {
+		mict = config.MaxIdleConnsTime
+	}
+
+	db.SetMaxOpenConns(moc)
+	db.SetMaxIdleConns(mic)
+	db.SetConnMaxLifetime(moct)
+	db.SetConnMaxIdleTime(mict)
 
 	return db, nil
 }

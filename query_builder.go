@@ -2,7 +2,6 @@ package gomysql
 
 import (
 	"fmt"
-	"strings"
 )
 
 // PrepareInsertColumn prepares (?,?,?)
@@ -12,9 +11,7 @@ func PrepareInsertColumn(columnCount int) string {
 		columnStr += `?,`
 	}
 
-	if strings.HasSuffix(columnStr, ",") {
-		columnStr = columnStr[:len(columnStr)-len(",")]
-	}
+	columnStr = columnStr[:len(columnStr)-len(",")]
 
 	columnStr += `)`
 
@@ -29,9 +26,7 @@ func PrepareBatchInsertColumns(rowCount int, columnCount int) string {
 		rowStr += fmt.Sprintf("%s,", PrepareInsertColumn(columnCount))
 	}
 
-	if strings.HasSuffix(rowStr, ",") {
-		rowStr = rowStr[:len(rowStr)-len(",")]
-	}
+	rowStr = rowStr[:len(rowStr)-len(",")]
 
 	return rowStr
 }
