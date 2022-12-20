@@ -40,7 +40,7 @@ if err != nil {
 Mysql 
 ```go
 config := gomysql.Config{
-	DBHost: "localhost'
+	DBHost: "localhost"
 	DBPort: "3306"
 	DBUser: "root"
 	DBPass: "root"
@@ -50,5 +50,29 @@ config := gomysql.Config{
 
 // To check connection
 status, err := c.ConnCheck()
+
+```
+
+Mysql with Newrelic
+```go
+config := gomysql.Config{
+	DBHost: "localhost"
+	DBPort: "3306"
+	DBUser: "root"
+	DBPass: "root"
+	DBName: "testdb"
+	MigrationDir "somedir" // use this to use custom directory
+	NewrelicEnabled: true
+}
+
+// To check connection
+status, err := c.ConnCheck()
+
+// To Query rows
+client := gomysql.GetClient(config)
+rows, err := client.QueryWithContext(ctx, "select * from table")
+if err != nil {
+	fmt.Println(err)
+}
 
 ```
