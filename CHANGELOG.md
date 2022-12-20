@@ -1,3 +1,6 @@
+## 0.4.0 (December 20, 2022)
+  - Added newrelic support
+
 ## 0.3.1 (November 18, 2022)
   - Removed db.close
 
