@@ -28,7 +28,9 @@ func (c Client) Migrate() error {
 	var migrationDir = flag.String("migration.files", mDir, "Directory where the migration files are located?")
 
 	// Run migrations
-	driver, err := mysql.WithInstance(dbConn, &mysql.Config{})
+	driver, err := mysql.WithInstance(dbConn, &mysql.Config{
+		MigrationsTable: c.config.MigrationsTable,
+	})
 	if err != nil {
 		return err
 	}
