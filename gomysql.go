@@ -35,6 +35,7 @@ type Config struct {
 	DBCharset        string
 	DBCollation      string
 	MigrationDir     string
+	MigrationsTable  string
 	ParaseTime       string
 	MaxOpenConns     int
 	MaxIdleConns     int
