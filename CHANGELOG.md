@@ -1,3 +1,6 @@
+## 0.5.0 (January 07, 2023)
+  - Added MigrationsTable config
+
 ## 0.4.0 (December 20, 2022)
   - Added newrelic support
 
