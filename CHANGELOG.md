@@ -1,3 +1,6 @@
+## 0.5.2 (January 14, 2023)
+  - Fixed migration table config for cleanup
+
 ## 0.5.1 (January 07, 2023)
   - Fix passing MigrationsTable to migrate package
 
